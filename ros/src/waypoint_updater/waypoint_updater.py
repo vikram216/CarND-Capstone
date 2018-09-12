@@ -136,7 +136,7 @@ class WaypointUpdater(object):
         self.pose = msg
     
 
-    def waypoints_cb(self, waypoints):
+    def waypoints_cb(self, lane):
         # TODO: Implement
         self.lane = lane
         if not self.waypoints_2d:
