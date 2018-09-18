@@ -45,7 +45,7 @@ class Controller(object):
 
         self.last_time       = rospy.get_time()
 
-    def control(self, *args, **kwargs):
+    def control(self, target_velocity, target_omega, current_velocity, current_omega, dbw_enabled):
         # TODO: Change the arg, kwarg list to suit your needs
         # Return throttle, brake, steer
 
