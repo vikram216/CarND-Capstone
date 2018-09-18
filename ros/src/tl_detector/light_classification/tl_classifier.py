@@ -1,19 +1,45 @@
-from styx_msgs.msg import TrafficLight
-import rospy
-import numpy
-import datetime
+import tensorflow as tf
 import os
+import numpy as np
+import time
+
 import cv2
+import rospy
+
+from styx_msgs.msg import TrafficLight
 
 class TLClassifier(object):
-    def __init__(self):
-        #TODO load classifier
-        self.saving = False
-        if self.saving:
-            time = str(datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S'))
-            self.folder = '/home/student/drive/images/' + time + '/'
-            self.count = 0
-            os.mkdir(self.folder)
+    @staticmethod
+    def _load_graph(ckpt_path):
+        rospy.loginfo('tl_classifier: _load_graph started')
+
+        detection_graph = tf.Graph()
+        with detection_graph.as_default():
+            od_graph_def = tf.GraphDef()
+            with tf.gfile.GFile(ckpt_path, 'rb') as fid:
+                serialized_graph = fid.read()
+                od_graph_def.ParseFromString(serialized_graph)
+                tf.import_graph_def(od_graph_def, name='')
+
+        rospy.loginfo('tl_classifier: _load_graph finished')
+        return detection_graph
+
+     def __init__(self):
+        self.is_sim = True
+        current_dir = os.path.dirname(os.path.realpath(__file__))
+        if self.is_sim:
+            model_dir = current_dir + '/../model/faster_rcnn_inception_v2_coco_sim'
+        ckpt_path = model_dir + '/frozen_inference_graph.pb'
+
+        detection_graph = TLClassifier._load_graph(ckpt_path)
+        self.detection_graph = detection_graph
+        self.sess = tf.Session(graph=detection_graph)
+        self.image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
+        self.detection_boxes = detection_graph.get_tensor_by_name('detection_boxes:0')
+        self.detection_scores = detection_graph.get_tensor_by_name('detection_scores:0')
+        self.detection_classes = detection_graph.get_tensor_by_name('detection_classes:0')
+        self.num_detections = detection_graph.get_tensor_by_name('num_detections:0')
+
 
     def get_classification(self, image):
         """Determines the color of the traffic light in the image
@@ -25,19 +51,42 @@ class TLClassifier(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        #TODO implement light color prediction
-        tol = 50
-        utol = 255 - tol
-        b, g, r = image[:, :, 0], image[:, :, 1], image[:, :, 2]
-        is_red = numpy.logical_and(r > utol, numpy.logical_and(g < tol, b < tol))
-        red_pixels = numpy.sum(is_red)
+        time_start = time.time()
 
-        if self.saving:
-            self.count += 1
-            cv2.imwrite(self.folder + str(self.count) + '.png', image)
-            rospy.logerr(str(red_pixels))
+        # Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+        image_np_expanded = np.expand_dims(image, axis=0)
 
-        if red_pixels > 30:
-            return TrafficLight.RED
-        else:
+        (boxes, scores, classes, num) = self.sess.run(
+            [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
+            feed_dict={self.image_tensor: image_np_expanded})
+
+        elapsed = time.time() - time_start
+
+        boxes = np.squeeze(boxes)
+        scores = np.squeeze(scores)
+        classes = np.squeeze(classes).astype(np.int32)
+
+        if len(scores) < 1 or scores[0] < 0.5:
             return TrafficLight.UNKNOWN
+
+        cls = classes[0]
+        rospy.loginfo("tl_classifier: class=" + str(cls) + ", score=" + str(scores[0]) + ", elapsed=" + str(elapsed))
+
+        # cv2.imwrite('/capstone/ros/output/camera_image_' + str(time_start) + '_' + str(cls) + '.jpeg', image)
+
+        box = boxes[0]
+        box_h = box[2] - box[0]
+        box_w = box[3] - box[1]
+        
+        if box_h < 0.03 or box_w < 0.01:  
+            rospy.loginfo("tl_classifier: too small")
+            return TrafficLight.UNKNOWN
+
+        if cls == 1:
+            return TrafficLight.RED
+        elif cls == 2:
+            return TrafficLight.YELLOW
+        elif cls == 3:
+            return TrafficLight.GREEN
+
+        return TrafficLight.UNKNOWN
