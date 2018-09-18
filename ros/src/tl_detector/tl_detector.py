@@ -86,7 +86,7 @@ class TLDetector(object):
         self.egoCar_pose = msg.pose
 
     def track_waypoints_cb(self, waypoints):
-        self.full_track_wpts  = waypoint
+        self.full_track_wpts  = waypoints
 
     def traffic_lights_cb(self, msg):
         self.traffic_lights_List = msg.lights
