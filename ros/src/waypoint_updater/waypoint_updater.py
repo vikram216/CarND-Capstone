@@ -324,6 +324,14 @@ class WaypointUpdater(object):
         """
         self.stopline_wp_index = msg.data
 
+    def trafficLights_cb(self, msg):
+        """
+        callback function that sets the waypoints of the capstone track traffic
+        Input: 
+            list of traffic waypoints
+        """
+        self.traffic_lights_List = msg
+
     def velocity_cb(self, msg):
         """
         callback function for the twist message and sets the current velocity
