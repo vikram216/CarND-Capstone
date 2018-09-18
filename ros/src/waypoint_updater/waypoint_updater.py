@@ -181,7 +181,7 @@ class WaypointUpdater(object):
 
         self.egoCar_ahead_waypoints = egoCar_ahead_waypoints
 
-     def publish_egoCar_waypoints(self):
+    def publish_egoCar_waypoints(self):
         """
         publish_waypoints(waypoints)
         sets up the header and publishes the waypoint message

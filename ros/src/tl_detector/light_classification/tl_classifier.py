@@ -24,7 +24,7 @@ class TLClassifier(object):
         rospy.loginfo('tl_classifier: _load_graph finished')
         return detection_graph
 
-     def __init__(self):
+    def __init__(self):
         self.is_sim = True
         current_dir = os.path.dirname(os.path.realpath(__file__))
         if self.is_sim:
