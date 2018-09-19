@@ -37,9 +37,37 @@ This node subscribes to following topics:
 
 **current_pose:** To receive current position of vehicle.
 
+The functionality of the waypoint updater node is to process the track waypoints that are provided from the waypoint_loader and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
+
 ### Controller Module (Twist Controller)
 
-The functionality of the waypoint updater node is to process the track waypoints that are provided from the waypoint_loader and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
+This node is responsible for vehicle control (acceleration, steering, brake).
+
+This node subscribes to the following topics:
+
+* **dbw_enabled:** Indicates if the car is under dbw or driver control.
+* **current_velocity:** To receive the current velocity of the vehicle.
+* **twist_cmd:** Target vehicle linear and angular velocities in the form of twist commands are published to this topic.
+
+This node publishes to following topics:
+
+* **steering_cmd:** Steering commands are published to this topic.
+* **throttle_cmd:** Throttle commands are published to this topic.
+* **brake_cmd:** Brake commands are published to this topic.
+To calculate vehicle control commands for steering, throttle and brake this node makes use of Controller (as coded in twist_controller.py).
+
+The throttle of the car is calculated based on the current velocity and the target velocity and controlled by a PID controller for error correction. The PID controller uses the following parameters.
+
+```
+kp   = 1.0
+ki   = 0.0008
+kd   = 0.15
+```
+The parameters may need to be tweaked in real world situation as the current settings were for the simulator.
+
+The ```Yaw Controller``` controls the steering angle based on the current linear velocity and the target linear and angular velocity.
+
+The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'. Brake is applied only if the target velocity is less than the current velocity.
 
 
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
