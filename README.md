@@ -69,7 +69,7 @@ The ```Yaw Controller``` controls the steering angle based on the current linear
 
 The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'. Brake is applied only if the target velocity is less than the current velocity.
 
-## Perception Module (Traffic light detection and classification)
+### Perception Module (Traffic light detection and classification)
 
 The perception subsystem dynamically detects traffic lights in the proximity of the vehicle and classifies its color.
 
@@ -88,6 +88,11 @@ The pre-trained model was fine-tuned using TensorFlow's [Object Detection API](h
 ![alt Text](imgs/tl_detection_yellow.png)
 
 ![alt Text](imgs/tl_detection_red.png)
+
+## Final Result
+
+I was able to successfully make the car drive in auto mode in the simulator meeting all the project criteria and the car has successfully completed driving around the simulator track. [Here](https://www.youtube.com/watch?v=FgYhN1_3MX4) is a video of the sample run.
+
 
 
 # Original README from Udacity
