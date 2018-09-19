@@ -50,7 +50,6 @@ class WaypointUpdater(object):
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size=1)
         rospy.Subscriber('/obstacle_waypoint', Lane, self.obstacle_cb, queue_size=1)
         rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.trafficLights_cb, queue_size=1)
-        rospy.Subscriber('/obstacle_waypoint', Lane, self.obstacle_cb, queue_size=1)
 
         # Publisher nodes
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
