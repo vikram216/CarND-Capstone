@@ -69,6 +69,28 @@ The ```Yaw Controller``` controls the steering angle based on the current linear
 
 The brake value is based on multiple parameters, viz. the mass of the vehicle, current velocity of the car and the radius of the wheel. The deceleration is limited by the parameter 'decel_limit'. Brake is applied only if the target velocity is less than the current velocity.
 
+## Perception Module (Traffic light detection and classification)
+
+The perception subsystem dynamically detects traffic lights in the proximity of the vehicle and classifies its color.
+
+In the simulator the car faces a set of three traffic lights in the same state. In this exercise, the traffic light state space is restricted to {Green, Red, Yellow and Unknown}.
+
+The detector was built relying on a transfer learning approach: a pre-trained model on a different broader object detection task was fine-tuned to perform the specific task of detecting and classifying traffic lights. This decission is backed by the fact that the amount of training data is limited (the Udacity simulator and test track are enclosed environments, providing repetitive scenarios) hence overfitting is a potential issue. Using a pre-trained model allows to economize on the effort of training a feature extractor while avoiding overfitting in problems where data availability is an issue.
+
+The selected model architecture was a [Faster-RCNN](https://arxiv.org/abs/1506.01497), since it provides high speed inference (~100 ms region) and has superior perfomance on small objects (compared to SSD for instance).
+
+The pre-trained model was taken from TensorFlow's [model zoo](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md). In particular, ```faster_rcnn_inception_v2``` was used, which contains the weights of a Faster R-CNN with Inception architecture trained on the [COCO](http://cocodataset.org/#home) dataset.
+
+The pre-trained model was fine-tuned using TensorFlow's [Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection) with labeled snapshots from Udacity's simulator
+
+![alt Text](imgs/tl_detection_green.png)
+
+![alt Text](imgs/tl_detection_yellow.png)
+
+![alt Text](imgs/tl_detection_red.png)
+
+
+# Original README from Udacity
 
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
