@@ -4,6 +4,44 @@ The System Integration project is the final project of the Udacity Self-Driving 
 
 ![alt Text](imgs/udacity-carla.png)
 
+## Project Overview
+
+### Carla Architecture
+
+Carla is the custom Lincoln MKZ that Udacity has converted into a self-driving car. It's self-driving system is broken down into four major sub-systems: **Sensors, Perception, Planning** and **Control**.
+
+![alt Text](imgs/carla_architecture.png)
+
+* **Sensors:** Includes everything needed to understand its surroundings and location including cameras, lidar, GPS, radar, and IMU
+* **Perception:** Sensing the environment to perceive obstacles, traffic hazards as well as traffic lights and road signs.
+* **Planing:** Route planning to a given goal state using data from localization, perception and environment maps.
+* **Control:**  Actualising trajectories formed as part of planning, in order to actuate the vehicle through steering, throttle and brake commands.
+
+### ROS Architecture
+
+The ROS Architecture consists of different nodes that communicate with each other via ROS messages. The nodes and their communication with each other are depicted in the picture below.
+
+![alt Text](imgs/Ros_Architecture.png)
+
+## Implementation Details
+
+### Planning Module (Waypoint Updater)
+
+This node publishes the next 200 waypoints that are closest to vehicle's current location and are ahead of the vehicle. This node also considers obstacles and traffic lights to set the velocity for each waypoint.
+
+This node subscribes to following topics:
+
+**base_waypoints:** Waypoints for the whole track are published to this topic. This publication is a one-time only operation. The waypoint updater node receives these waypoints, stores them for later use and uses these points to extract the next 200 points ahead of the vehicle.
+
+**traffic_waypoint:** To receive the index of the waypoint in the base_waypoints list, which is closest to the red traffic light so that the vehicle can be stopped. The waypoint updater node uses this index to calculate the distance from the vehicle to the traffic light if the traffic light is red and the car needs to be stopped.
+
+**current_pose:** To receive current position of vehicle.
+
+### Controller Module (Twist Controller)
+
+The functionality of the waypoint updater node is to process the track waypoints that are provided from the waypoint_loader and provide the next waypoints that the car will follow. The speed is adjusted in the presence of a red traffic light ahead.
+
+
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 Please use **one** of the two installation options, either native **or** docker installation.
